@@ -1,25 +1,26 @@
+// components/Sidebar.jsx
 import { NavLink } from "react-router-dom";
 
 const NAV_ITEMS = [
-  { icon: "🏠", label: "Home",      to: "/" },
-  { icon: "🔥", label: "Trending",  to: "/search?sort=trending" },
-  { icon: "📺", label: "Feed",      to: "/feed" },
-  { icon: "📋", label: "Playlists", to: "/playlists" },
-  { icon: "🕓", label: "History",   to: "/history" },
+  { icon: "bi-house-fill",       label: "Home",      to: "/" },
+  { icon: "bi-fire",             label: "Trending",  to: "/search?sort=trending" },
+  { icon: "bi-collection-play",  label: "Feed",      to: "/feed" },
+  { icon: "bi-collection",       label: "Playlists", to: "/playlists" },
+  { icon: "bi-clock-history",    label: "History",   to: "/history" },
 ];
 
 const EXPLORE = [
-  { icon: "🎮", label: "Gaming",  to: "/search?category=gaming" },
-  { icon: "🎵", label: "Music",   to: "/search?category=music" },
-  { icon: "🎬", label: "Film",    to: "/search?category=film" },
-  { icon: "🔬", label: "Science", to: "/search?category=science" },
-  { icon: "⚽", label: "Sports",  to: "/search?category=sports" },
+  { icon: "bi-controller",       label: "Gaming",  to: "/search?category=gaming" },
+  { icon: "bi-music-note-beamed",label: "Music",   to: "/search?category=music" },
+  { icon: "bi-film",             label: "Film",    to: "/search?category=film" },
+  { icon: "bi-eyedropper",       label: "Science", to: "/search?category=science" },
+  { icon: "bi-trophy",           label: "Sports",  to: "/search?category=sports" },
 ];
 
 export default function Sidebar() {
   return (
     <aside className="sidebar">
-      <section>
+      <div className="sidebar-section">
         {NAV_ITEMS.map(({ icon, label, to }) => (
           <NavLink
             key={to}
@@ -27,29 +28,29 @@ export default function Sidebar() {
             end={to === "/"}
             className={({ isActive }) => "sidebar-link" + (isActive ? " active" : "")}
           >
-            <span style={{ fontSize: "1.1rem" }}>{icon}</span>
+            <span className="sidebar-link-icon">
+              <i className={`bi ${icon}`} />
+            </span>
             <span>{label}</span>
           </NavLink>
         ))}
-      </section>
+      </div>
 
-      <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "12px 16px" }} />
-
-      <p style={{ padding: "4px 20px", fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-        Explore
-      </p>
-      <section>
+      <div className="sidebar-section">
+        <p className="sidebar-section-title">Explore</p>
         {EXPLORE.map(({ icon, label, to }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) => "sidebar-link" + (isActive ? " active" : "")}
           >
-            <span style={{ fontSize: "1.1rem" }}>{icon}</span>
+            <span className="sidebar-link-icon">
+              <i className={`bi ${icon}`} />
+            </span>
             <span>{label}</span>
           </NavLink>
         ))}
-      </section>
+      </div>
     </aside>
   );
 }

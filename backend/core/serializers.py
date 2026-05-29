@@ -29,9 +29,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserMinimalSerializer(serializers.ModelSerializer):
-    """Compact representation used inside nested objects."""
     avatar_url       = serializers.SerializerMethodField()
-    subscriber_count = serializers.IntegerField(read_only=True, source="subscriber_count")
+    subscriber_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model  = User
@@ -178,7 +177,7 @@ class VideoUploadSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author      = UserMinimalSerializer(read_only=True)
     replies     = serializers.SerializerMethodField()
-    reply_count = serializers.IntegerField(read_only=True, source="reply_count")
+    reply_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model  = Comment

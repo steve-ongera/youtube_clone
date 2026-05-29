@@ -1,12 +1,13 @@
+// pages/Login.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI } from "../utils/api";
 
 export default function Login() {
-  const navigate             = useNavigate();
-  const [form,    setForm]   = useState({ username: "", password: "" });
-  const [error,   setError]  = useState(null);
-  const [loading, setLoading]= useState(false);
+  const navigate              = useNavigate();
+  const [form,    setForm]    = useState({ username: "", password: "" });
+  const [error,   setError]   = useState(null);
+  const [loading, setLoading] = useState(false);
 
   function handleChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -20,11 +21,8 @@ export default function Login() {
       const { data } = await authAPI.login(form);
       localStorage.setItem("access_token",  data.access);
       localStorage.setItem("refresh_token", data.refresh);
-
-      // Fetch user profile
       const me = await authAPI.me();
       localStorage.setItem("user", JSON.stringify(me.data));
-
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid username or password.");
@@ -34,43 +32,75 @@ export default function Login() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div className="form-card">
+    <div className="auth-page">
+      <div className="auth-card">
+
         {/* Logo */}
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <span style={{ fontFamily: "Outfit, sans-serif", fontSize: "1.8rem", fontWeight: 700, color: "var(--accent)" }}>▶ ViewTube</span>
+        <div className="auth-logo">
+          <span className="auth-logo-text">
+            <span className="logo-yt"><i className="bi bi-youtube" /></span> ViewTube
+          </span>
         </div>
 
-        <h2>Sign in</h2>
+        <h2 className="auth-title">Sign in</h2>
 
-        <form onSubmit={handleSubmit} style={{ marginTop: 8 }}>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Username</label>
-            <input name="username" value={form.username} onChange={handleChange} placeholder="your_username" autoFocus />
-          </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="••••••••" />
+            <label className="form-label" htmlFor="login-username">Username</label>
+            <input
+              id="login-username"
+              className={`form-input${error ? " error" : ""}`}
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              placeholder="your_username"
+              autoFocus
+              autoComplete="username"
+            />
           </div>
 
-          {error && <p className="form-error">{error}</p>}
+          <div className="form-group">
+            <label className="form-label" htmlFor="login-password">Password</label>
+            <input
+              id="login-password"
+              className={`form-input${error ? " error" : ""}`}
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              autoComplete="current-password"
+            />
+          </div>
+
+          {error && (
+            <p className="form-error" style={{ marginBottom: 12 }}>
+              <i className="bi bi-exclamation-circle" style={{ marginRight: 6 }} />
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary form-submit-btn"
             disabled={loading}
-            style={{ width: "100%", justifyContent: "center", padding: "12px", borderRadius: "var(--radius)", marginTop: 8, fontSize: "0.95rem" }}
           >
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? (
+              <><div className="spinner spinner--sm" style={{ borderTopColor: "#fff" }} /> Signing in…</>
+            ) : (
+              <><i className="bi bi-box-arrow-in-right" /> Sign in</>
+            )}
           </button>
         </form>
 
-        <p style={{ textAlign: "center", marginTop: 20, fontSize: "0.88rem", color: "var(--text-muted)" }}>
-          Don't have an account?{" "}
-          <Link to="/register" style={{ color: "var(--accent)" }}>Create one</Link>
+        <p className="form-footer-link">
+          Don't have an account? <Link to="/register">Create one</Link>
         </p>
-        <p style={{ textAlign: "center", marginTop: 8, fontSize: "0.88rem" }}>
-          <Link to="/" style={{ color: "var(--text-muted)" }}>← Back to ViewTube</Link>
+        <p className="form-footer-link" style={{ marginTop: 8 }}>
+          <Link to="/" style={{ color: "var(--yt-text-secondary)" }}>
+            <i className="bi bi-arrow-left" style={{ marginRight: 4 }} />
+            Back to ViewTube
+          </Link>
         </p>
       </div>
     </div>

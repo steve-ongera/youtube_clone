@@ -1,3 +1,4 @@
+// pages/Home.jsx
 import { useState, useEffect } from "react";
 import { videoAPI, categoryAPI } from "../utils/api";
 import VideoCard from "../components/VideoCard";
@@ -11,7 +12,12 @@ export default function Home() {
 
   // Load categories once
   useEffect(() => {
-    categoryAPI.list().then((res) => setCategories(res.data)).catch(() => {});
+    categoryAPI.list()
+      .then((res) => {
+        const data = res.data;
+        setCategories(Array.isArray(data) ? data : (data.results ?? []));
+      })
+      .catch(() => {});
   }, []);
 
   // Load videos when filter changes
@@ -20,18 +26,23 @@ export default function Home() {
     setError(null);
     const params = activeSlug ? { category__slug: activeSlug } : {};
     videoAPI.list(params)
-      .then((res) => setVideos(res.data.results || res.data))
-      .catch(() => setError("Failed to load videos."))
+      .then((res) => {
+        const data = res.data;
+        setVideos(Array.isArray(data) ? data : (data.results ?? []));
+      })
+      .catch((err) => {
+        const msg = err?.response?.data?.detail ?? "Failed to load videos.";
+        setError(msg);
+      })
       .finally(() => setLoading(false));
   }, [activeSlug]);
 
   return (
     <div>
       {/* Category chips */}
-      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 12, marginBottom: 20, scrollbarWidth: "none" }}>
+      <div className="chip-bar">
         <button
-          className={`btn ${!activeSlug ? "btn-primary" : "btn-ghost"}`}
-          style={{ flexShrink: 0 }}
+          className={`chip ${!activeSlug ? "active" : ""}`}
           onClick={() => setActiveSlug(null)}
         >
           All
@@ -39,8 +50,7 @@ export default function Home() {
         {categories.map((cat) => (
           <button
             key={cat.id}
-            className={`btn ${activeSlug === cat.slug ? "btn-primary" : "btn-ghost"}`}
-            style={{ flexShrink: 0 }}
+            className={`chip ${activeSlug === cat.slug ? "active" : ""}`}
             onClick={() => setActiveSlug(cat.slug === activeSlug ? null : cat.slug)}
           >
             {cat.name}
@@ -48,16 +58,33 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Grid */}
-      {loading && <div className="spinner" />}
-      {error   && <p className="error-msg">{error}</p>}
+      {/* Loading */}
+      {loading && (
+        <div className="spinner-wrap">
+          <div className="spinner" />
+        </div>
+      )}
 
+      {/* Error */}
+      {error && (
+        <div className="error-state">
+          <i className="bi bi-exclamation-circle" style={{ fontSize: "2rem", display: "block", marginBottom: 8 }} />
+          {error}
+        </div>
+      )}
+
+      {/* Grid */}
       {!loading && !error && (
-        videos.length > 0
-          ? <div className="video-grid">
-              {videos.map((v) => <VideoCard key={v.id} video={v} />)}
-            </div>
-          : <p className="empty-msg">No videos found.</p>
+        videos.length > 0 ? (
+          <div className="video-grid">
+            {videos.map((v) => <VideoCard key={v.id} video={v} />)}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <i className="bi bi-camera-video-off" style={{ fontSize: "2.5rem", display: "block", marginBottom: 12 }} />
+            No videos found.
+          </div>
+        )
       )}
     </div>
   );
